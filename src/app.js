@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
-export { app };
+export default { app };
 
 app.use(
   cors({
