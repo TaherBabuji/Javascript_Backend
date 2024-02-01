@@ -15,16 +15,16 @@ const registerUser = asyncHandler(async (req, res) => {
   // check for user creation
   // return response
 
-  const { fullname, email, username, password } = req.body;
-  console.log("email: ", email);
+  const { fullName, email, username, password } = req.body;
+  // console.log("email: ", email);
 
   if (
-    [fullname, email, username, password].some((field) => field?.trim() === "") //https://chat.openai.com/c/8f3f4d6f-c849-43a6-aec0-74ac75d8bea5
+    [fullName, email, username, password].some((field) => field?.trim() === "") //https://chat.openai.com/c/8f3f4d6f-c849-43a6-aec0-74ac75d8bea5
   ) {
     throw new ApiError(400, "All fields are required");
   }
 
-  const existedUser = User.findOne({
+  const existedUser = await User.findOne({
     //https://chat.openai.com/c/bf72d9e6-973f-40f2-b27b-dc1a75cf2afb
     $or: [{ email }, { username }],
   });
@@ -34,7 +34,15 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const avatarLocalPath = req.files?.avatar[0]?.path; //https://chat.openai.com/c/9c9ab916-3d74-46e1-a41a-da78fb6c9199
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  let coverImageLocalPath;
+  if (
+    req.files &&
+    Array.isArray(req.files.coverImage) &&
+    req.files.coverImage.length > 0
+  ) {
+    coverImageLocalPath = req.files.coverImage[0].path;
+  }
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required");
@@ -48,7 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({
-    fullname,
+    fullName,
     avatar: avatar.url,
     coverImage: coverImage?.url || "",
     email,

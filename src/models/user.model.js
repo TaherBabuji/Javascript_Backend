@@ -51,7 +51,8 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async function (next) {
   //https://chat.openai.com/c/546f392e-f427-4001-a5ba-8650b6d22a26
-  if (!this.password.isModified()) return next();
+  // if (!this.password.isModified()) return next();
+  if (!this.isModified("password")) return next();
 
   this.password = await bcrypt.hash(this.password, 10);
   next();
