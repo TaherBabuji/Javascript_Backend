@@ -28,12 +28,14 @@ const registerUser = asyncHandler(async (req, res) => {
     //https://chat.openai.com/c/bf72d9e6-973f-40f2-b27b-dc1a75cf2afb
     $or: [{ email }, { username }],
   });
+  // console.log(existedUser);
 
   if (existedUser) {
     throw new ApiError(404, "User with this email or username already exists");
   }
 
   const avatarLocalPath = req.files?.avatar[0]?.path; //https://chat.openai.com/c/9c9ab916-3d74-46e1-a41a-da78fb6c9199
+  // console.log(avatarLocalPath);
   // const coverImageLocalPath = req.files?.coverImage[0]?.path;
   let coverImageLocalPath;
   if (
@@ -43,6 +45,7 @@ const registerUser = asyncHandler(async (req, res) => {
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
+  // console.log(coverImageLocalPath);
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required");
@@ -50,6 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  // console.log(avatar);
 
   if (!avatar) {
     throw new ApiError(400, "Avatar file is  required");
@@ -63,6 +67,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     username: username.toLowerCase(),
   });
+  // console.log(user);
 
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
