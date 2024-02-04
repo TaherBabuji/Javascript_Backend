@@ -9,11 +9,15 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
 
+    console.log("Received Access Token for Logout:", token);
+
     if (!token) {
       throw new ApiError(401, "Unauthorized request");
     }
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    console.log("Decoded Token for Logout:", decodedToken);
 
     const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"
