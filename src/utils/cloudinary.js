@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { ApiError } from "./ApiError.js";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -25,4 +26,20 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-export { uploadOnCloudinary };
+const deleteFromCloudinary = async (oldLocalFilePath) => {
+  try {
+    if (!oldLocalFilePath) {
+      return "old local file path not found while deleting old file";
+    }
+
+    const response = await cloudinary.uploader.destroy(oldLocalFilePath, {
+      resource_type: "auto",
+    });
+
+    return response;
+  } catch (error) {
+    throw new ApiError(400, ("Error while deleting old file: ", error));
+  }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary };
