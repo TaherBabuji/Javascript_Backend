@@ -31,14 +31,32 @@ const deleteFromCloudinary = async (oldLocalFilePath) => {
     if (!oldLocalFilePath) {
       return "old local file path not found while deleting old file";
     }
+    console.log("old file path: ", oldLocalFilePath);
 
-    const response = await cloudinary.uploader.destroy(oldLocalFilePath, {
-      resource_type: "auto",
+    function extractPublicId(url) {
+      // Split the URL by '/'
+      const parts = url.split("/");
+      // Get the last part of the URL (which contains the filename and extension)
+      const filename = parts.pop();
+      // Remove the file extension to get the public ID
+      const publicId = filename.split(".")[0];
+      return publicId;
+    }
+
+    const publicId = extractPublicId(oldLocalFilePath);
+
+    const response = await cloudinary.uploader.destroy(publicId, {
+      resource_type: "image",
     });
+
+    console.log("response: ", response);
 
     return response;
   } catch (error) {
-    throw new ApiError(400, ("Error while deleting old file: ", error));
+    throw new ApiError(
+      500,
+      `Error while deleting old file from Cloudinary: ${error.message}`
+    );
   }
 };
 

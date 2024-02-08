@@ -7,6 +7,7 @@ import {
 } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -309,16 +310,14 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     _id,
     {
-      set: {
-        avatar: avatar?.url,
-      },
+      avatar: avatar?.url,
     },
     {
       new: true,
     }
   ).select("-password -refreshToken");
 
-  if (oldAvatarPublicId.length !== 0) {
+  if (oldAvatarPublicId && oldAvatarPublicId.length !== 0) {
     await deleteFromCloudinary(oldAvatarPublicId);
   }
 
@@ -346,16 +345,14 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     _id,
     {
-      $set: {
-        coverImage: coverImage?.url,
-      },
+      coverImage: coverImage?.url,
     },
     {
       new: true,
     }
   ).select("-password -refreshToken");
 
-  if (oldCoverImagePublicId.length !== 0) {
+  if (oldCoverImagePublicId && oldCoverImagePublicId.length !== 0) {
     await deleteFromCloudinary(oldCoverImagePublicId);
   }
 
@@ -439,9 +436,10 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
+    //https://chat.openai.com/c/15f2290f-3d82-4614-8c13-21e58b2c0185
     {
       $match: {
-        _id: new mongoose.Types.ObjectId(req.user._id),
+        _id: new mongoose.Types.ObjectId(req.user?._id),
       },
     },
     {
