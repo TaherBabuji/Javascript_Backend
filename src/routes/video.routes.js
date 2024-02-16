@@ -1,8 +1,10 @@
 import { Router } from "express";
 import {
+  deleteVideo,
   getAllVideos,
   getVideoById,
   publishAVideo,
+  togglePublishStatus,
   updateVideo,
 } from "../controllers/video.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -29,5 +31,7 @@ router.route("/getVideoById/:videoId").get(getVideoById);
 router
   .route("/updateVideo/:videoId")
   .patch(upload.single("thumbnail"), updateVideo);
+router.route("/deleteVideo/:videoId").delete(deleteVideo);
+router.route("/togglePublishStatus/:videoId").patch(togglePublishStatus);
 
 export default router;

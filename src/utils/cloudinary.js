@@ -31,7 +31,7 @@ const deleteFromCloudinary = async (oldLocalFilePath) => {
     if (!oldLocalFilePath) {
       return "old local file path not found while deleting old file";
     }
-    console.log("old file path: ", oldLocalFilePath);
+    // console.log("old file path: ", oldLocalFilePath);
 
     function extractPublicId(url) {
       // Split the URL by '/'
@@ -49,15 +49,49 @@ const deleteFromCloudinary = async (oldLocalFilePath) => {
       resource_type: "image",
     });
 
-    console.log("response: ", response);
+    // console.log("response: ", response);
 
     return response;
   } catch (error) {
     throw new ApiError(
       500,
-      `Error while deleting old file from Cloudinary: ${error.message}`
+      `Error while deleting old image file from Cloudinary: ${error.message}`
     );
   }
 };
 
-export { uploadOnCloudinary, deleteFromCloudinary };
+const deleteVideoFromCloudinary = async (oldLocalFilePath) => {
+  try {
+    if (!oldLocalFilePath) {
+      return "old local file path not found while deleting old file";
+    }
+    // console.log("old file path: ", oldLocalFilePath);
+
+    function extractPublicId(url) {
+      // Split the URL by '/'
+      const parts = url.split("/");
+      // Get the last part of the URL (which contains the filename and extension)
+      const filename = parts.pop();
+      // Remove the file extension to get the public ID
+      const publicId = filename.split(".")[0];
+      return publicId;
+    }
+
+    const publicId = extractPublicId(oldLocalFilePath);
+
+    const response = await cloudinary.uploader.destroy(publicId, {
+      resource_type: "video",
+    });
+
+    // console.log("response: ", response);
+
+    return response;
+  } catch (error) {
+    throw new ApiError(
+      500,
+      `Error while deleting old video file from Cloudinary: ${error.message}`
+    );
+  }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary, deleteVideoFromCloudinary };
