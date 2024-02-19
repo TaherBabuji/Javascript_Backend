@@ -140,6 +140,45 @@ const getVideoById = asyncHandler(async (req, res) => {
         foreignField: "video",
         localField: "_id",
         as: "comments",
+        pipeline: [
+          {
+            $lookup: {
+              from: "likes",
+              foreignField: "comment",
+              localField: "_id",
+              as: "commentLikes",
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              foreignField: "_id",
+              localField: "owner",
+              as: "commentOwner",
+            },
+          },
+          {
+            $addFields: {
+              avatar: {
+                $first: "$commentOwner.avatar",
+              },
+              username: {
+                $first: "$commentOwner.username",
+              },
+              likesCount: {
+                $size: "$commentLikes",
+              },
+            },
+          },
+          {
+            $project: {
+              username: 1,
+              avatar: 1,
+              content: 1,
+              likesCount: 1,
+            },
+          },
+        ],
       },
     },
     {
