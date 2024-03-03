@@ -86,4 +86,27 @@ const getChannelStats = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, data, "Channel stats fetched successfully"));
 });
 
-export { getChannelStats };
+const getChannelVideos = asyncHandler(async (req, res) => {
+  const videos = await Video.find({
+    owner: req.user?._id,
+  });
+
+  if (!videos) {
+    throw new ApiError(
+      400,
+      "Something went wrong while finding videos of this user"
+    );
+  }
+
+  if (videos.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Currently you haven't uploaded any videos"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, videos, "All videos fetched successfully"));
+});
+
+export { getChannelStats, getChannelVideos };
